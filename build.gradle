@@ -1,0 +1,115 @@
+version '1.0-SNAPSHOT'
+
+apply plugin: 'groovy'
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'jacoco'
+apply plugin: 'release'
+
+
+configurations.all {
+    resolutionStrategy.cacheDynamicVersionsFor 5 * 60, 'seconds' // 5 minutos
+    resolutionStrategy.cacheChangingModulesFor 5 * 60, 'seconds' // 5 minutos
+
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        if (details.requested.name == 'groovy') {
+            details.useTarget group: details.requested.group, name: 'groovy-all', version: details.requested.version
+        }
+    }
+}
+
+uploadArchives {
+    repositories.mavenDeployer {
+        repository(url: "$artifactory_contextUrl/libs-release-local/") {
+            authentication(userName: artifactory_user, password: artifactory_password)
+        }
+        snapshotRepository(url: "$artifactory_contextUrl/libs-snapshot-local/") {
+            authentication(userName: artifactory_user, password: artifactory_password)
+        }
+    }
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        maven {
+            url "$artifactory_contextUrl/libs-release/"
+            credentials {
+                username = artifactory_user
+                password = artifactory_password
+            }
+        }
+    }
+    dependencies {
+        classpath group: 'gradle-release', name: 'gradle-release', version: '1.4.7'
+    }
+}
+
+release {
+    ext['gradle.release.useAutomaticVersion'] = true
+}
+
+createReleaseTag.dependsOn uploadArchives
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven {
+        url "$artifactory_contextUrl/libs-release/"
+        credentials {
+            username = artifactory_user
+            password = artifactory_password
+        }
+    }
+}
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy-all:2.0.8'
+
+    compile('org.springframework.session:spring-session-data-redis:1.1.1.RELEASE') {
+        exclude module: 'spring-context'
+        exclude module: 'spring-context-support'
+        exclude module: 'spring-aop'
+        exclude module: 'spring-core'
+        exclude module: 'spring-tx'
+    }
+
+    compile('org.springframework.security:spring-security-core:3.0.7.RELEASE') {
+        exclude module: 'spring-context'
+        exclude module: 'spring-context-support'
+        exclude module: 'spring-aop'
+        exclude module: 'spring-core'
+        exclude module: 'spring-tx'
+        exclude module: 'spring-expression'
+    }
+    compile ('org.springframework.security:spring-security-web:3.0.7.RELEASE') {
+        exclude module: 'spring-web'
+        exclude module: 'spring-core'
+        exclude module: 'spring-security-core'
+    }
+
+    compile ('org.springframework:spring-web:3.0.7.RELEASE'){
+        exclude module: 'spring-context'
+    }
+
+    compile 'javax.servlet:javax.servlet-api:3.0.1'
+    compile 'commons-lang:commons-lang:2.6'
+
+    testCompile('org.spockframework:spock-core:0.7-groovy-2.0'){
+        exclude module: 'groovy-all'
+    }
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar
+}
+
+test {
+    ignoreFailures = true
+}

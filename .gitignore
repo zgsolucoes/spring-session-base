@@ -1,0 +1,16 @@
+.gradle
+.DS_Store
+*.iml
+*.iws
+*.log
+*.rdb
+/.idea
+/.classpath
+/.project
+classes/
+/.settings
+/build
+/plugin.xml
+/target
+/web-app
+.slcache
