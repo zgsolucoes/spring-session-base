@@ -70,7 +70,7 @@ public class JdkDeserializer implements Deserializer<Object> {
                 Class localClass; // the class in the local JVM that this descriptor represents.
                 String name = classDescriptor.getName();
                 try {
-                    localClass = Class.forName(name);
+                    localClass = classForName(name);
                 } catch (ClassNotFoundException e) {
                     // local class not found, searching for equivalents...
                     localClass = searchEquivalentClass(name);
@@ -103,12 +103,12 @@ public class JdkDeserializer implements Deserializer<Object> {
         if(name.contains(OLD_PACKAGE_NAME)){
 			// Try the new internal package
 			try{
-				return Class.forName(name.replace(OLD_PACKAGE_NAME, NEW_INTERNAL_PACKAGE), instantiate, classLoader);
+				return classForName(name.replace(OLD_PACKAGE_NAME, NEW_INTERNAL_PACKAGE));
 			}
 			catch (ClassNotFoundException e){}
 			// Try the new public package
 			try{
-				return Class.forName(name.replace(OLD_PACKAGE_NAME, NEW_PUBLIC_PACKAGE), instantiate, classLoader);
+				return classForName(name.replace(OLD_PACKAGE_NAME, NEW_PUBLIC_PACKAGE));
 			}
 			catch (ClassNotFoundException e){}
 		}
@@ -116,7 +116,7 @@ public class JdkDeserializer implements Deserializer<Object> {
 		else if(name.contains(NEW_INTERNAL_PACKAGE)){
 			// Try the old package
 			try{
-				return Class.forName(name.replace(NEW_INTERNAL_PACKAGE, OLD_PACKAGE_NAME), instantiate, classLoader);
+				return classForName(name.replace(NEW_INTERNAL_PACKAGE, OLD_PACKAGE_NAME));
 			}
 			catch (ClassNotFoundException e){}
 		}
@@ -124,10 +124,14 @@ public class JdkDeserializer implements Deserializer<Object> {
 		else if(name.contains(NEW_PUBLIC_PACKAGE)){
 			// Try the old package
 			try{
-				return Class.forName(name.replace(NEW_PUBLIC_PACKAGE, OLD_PACKAGE_NAME), instantiate, classLoader);
+				return classForName(name.replace(NEW_PUBLIC_PACKAGE, OLD_PACKAGE_NAME));
 			}
 			catch (ClassNotFoundException e){}
 		}
         return null;
     }
+
+	private Class<?> classForName(String name) throws ClassNotFoundException {
+		return Class.forName(name, instantiate, classLoader);
+	}
 }
