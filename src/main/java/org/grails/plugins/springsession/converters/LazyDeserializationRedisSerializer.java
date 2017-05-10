@@ -27,7 +27,10 @@ public class LazyDeserializationRedisSerializer implements RedisSerializer<Objec
 		try {
 			if (object instanceof LazyDeserializationObject) {
 				LazyDeserializationObject lazyDeserializationObject = (LazyDeserializationObject) object;
-				lazyDeserializationObject.setSerialized(serializer.convert(lazyDeserializationObject.getDeserializaded()));
+				Object deserializaded = lazyDeserializationObject.getDeserializaded();
+				if(deserializaded != null){
+					lazyDeserializationObject.setSerialized(serializer.convert(deserializaded));
+				}
 				return serializer.convert(lazyDeserializationObject);
 			} else {
 				return serializer.convert(object);
