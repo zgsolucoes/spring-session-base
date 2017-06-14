@@ -111,3 +111,6 @@ artifacts {
 test {
     ignoreFailures = true
 }
+
+sourceSets.main.java.srcDirs = []
+sourceSets.main.groovy.srcDirs += ["src/main/java"]
