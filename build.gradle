@@ -94,7 +94,7 @@ dependencies {
     compile 'javax.servlet:javax.servlet-api:3.0.1'
     compile 'commons-lang:commons-lang:2.6'
 
-    testCompile('org.spockframework:spock-core:0.7-groovy-2.0'){
+    testCompile('org.spockframework:spock-core:1.1-groovy-2.0'){
         exclude module: 'groovy-all'
     }
 }
