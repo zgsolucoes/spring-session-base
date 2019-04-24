@@ -8,12 +8,6 @@ apply plugin: 'release'
 configurations.all {
     resolutionStrategy.cacheDynamicVersionsFor 5 * 60, 'seconds' // 5 minutos
     resolutionStrategy.cacheChangingModulesFor 5 * 60, 'seconds' // 5 minutos
-
-    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
-        if (details.requested.name == 'groovy') {
-            details.useTarget group: details.requested.group, name: 'groovy-all', version: details.requested.version
-        }
-    }
 }
 
 uploadArchives {
@@ -40,7 +34,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath group: 'gradle-release', name: 'gradle-release', version: '1.5.2'
+		classpath 'gradle-release:gradle-release:1.7.1'
     }
 }
 
@@ -60,6 +54,12 @@ repositories {
             password = artifactory_password
         }
     }
+}
+
+configurations {
+	compile {
+		exclude group: 'org.codehaus.groovy', module: 'groovy'
+	}
 }
 
 dependencies {
@@ -108,10 +108,5 @@ artifacts {
     archives sourcesJar
 }
 
-test {
-    ignoreFailures = true
-}
-
 sourceSets.main.java.srcDirs = []
 sourceSets.main.groovy.srcDirs += ["src/main/java"]
-
