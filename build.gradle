@@ -103,7 +103,6 @@ artifacts {
 }
 
 task uploadRelease(dependsOn: uploadArchives) {
-
 }
 
 release {
